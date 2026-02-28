@@ -32,7 +32,22 @@
       "Bash(redis-cli -p 6379 HSET user name malinghan age 30 city beijing && \\\\\nredis-cli -p 6379 HGET user name && \\\\\nredis-cli -p 6379 HGETALL user && \\\\\nredis-cli -p 6379 HEXISTS user email && \\\\\nredis-cli -p 6379 HDEL user city && \\\\\nredis-cli -p 6379 HLEN user && \\\\\nredis-cli -p 6379 HMGET user name age)",
       "Bash(redis-cli -p 6379 ZADD leaderboard 100 alice 90 bob 95 carol && \\\\\nredis-cli -p 6379 ZCARD leaderboard && \\\\\nredis-cli -p 6379 ZSCORE leaderboard alice && \\\\\nredis-cli -p 6379 ZRANK leaderboard bob && \\\\\nredis-cli -p 6379 ZCOUNT leaderboard 90 100 && \\\\\nredis-cli -p 6379 ZREM leaderboard bob && \\\\\nredis-cli -p 6379 ZCARD leaderboard)",
       "Bash(git commit -m \"$\\(cat <<'EOF'\nAdd v3.0 development plan\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
-      "Bash(git push origin master && git push origin v1.0 v2.0 2>&1)"
+      "Bash(git push origin master && git push origin v1.0 v2.0 2>&1)",
+      "Bash(redis-cli -p 6379 SET session_token abc123 && \\\\\nredis-cli -p 6379 EXPIRE session_token 5 && \\\\\nredis-cli -p 6379 TTL session_token)",
+      "Bash(redis-cli -p 6379 SET mystr hello && \\\\\nredis-cli -p 6379 LPUSH mystr world && \\\\\nredis-cli -p 6379 RPUSH mylist a b c && \\\\\nredis-cli -p 6379 HSET mylist field value && \\\\\nredis-cli -p 6379 SADD myset x y && \\\\\nredis-cli -p 6379 ZADD myset 100 member)",
+      "Bash(git add src/ && git status --short)",
+      "Bash(git commit -m \"$\\(cat <<'EOF'\nRegister ZSet and TTL commands in Commands.java \\(v3.0\\)\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git tag v3.0 && git push origin master && git push origin v3.0 2>&1)",
+      "Bash(git add DESIGN.md && git diff --cached --stat)",
+      "Bash(git commit -m \"$\\(cat <<'EOF'\nUpdate DESIGN.md with design patterns analysis\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\" && git push origin master)",
+      "Bash(mvn compile 2>&1 | tail -30)",
+      "Bash(mvn compile 2>&1 | tail -15)",
+      "Bash(redis-cli -p 6379 GET persistent_key && \\\\\nredis-cli -p 6379 LRANGE mylist 0 -1 && \\\\\nredis-cli -p 6379 HGETALL user && \\\\\nredis-cli -p 6379 ZSCORE rank alice)",
+      "Bash(redis-cli -p 6379 BGREWRITEAOF && sleep 1 && cat /Users/malinghan/project/macache/macache.aof)",
+      "Bash(redis-cli -p 6379 SET persistent_key hello_world && \\\\\nredis-cli -p 6379 LPUSH mylist a b c && \\\\\nredis-cli -p 6379 HSET user name kim age 30 && \\\\\nredis-cli -p 6379 ZADD rank 100 alice 90 bob)",
+      "Bash(git add src/ v4.0.md && git status --short)",
+      "Bash(git commit -m \"$\\(cat <<'EOF'\nImplement v4.0 - AOF persistence\n\n- Add AofWriter for appending write commands to AOF file\n- Add AofLoader for replaying AOF on startup\n- Add BGREWRITEAOF command for AOF compaction\n- Integrate AOF write in MaCacheHandler after successful write commands\n- Integrate AOF load in MaCacheServer.init\\(\\) before server startup\n- Add MaCache.getAll\\(\\) for AOF rewrite to access all entries\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git tag v4.0 && git push origin master && git push origin v4.0 2>&1)"
     ]
   }
 }
