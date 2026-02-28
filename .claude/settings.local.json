@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mvn compile -q 2>&1)",
+      "Bash(mvn spring-boot:run 2>&1 | head -60)",
+      "Bash(lsof -i :6379 | grep LISTEN)",
+      "Bash(kill 54334)",
+      "Bash(kill -9 54334 && sleep 2 && lsof -i :6379)",
+      "Bash(redis-cli -p 6379 PING)",
+      "Bash(echo -e \"PING\\\\r\\\\n\" | nc localhost 6379)",
+      "Bash(printf \"*1\\\\r\\\\n\\\\$4\\\\r\\\\nPING\\\\r\\\\n\" | nc -q1 localhost 6379)",
+      "Bash(pkill -f \"macache\" 2>/dev/null; sleep 2; lsof -i :6379)",
+      "Bash(printf \"*1\\\\r\\\\n\\\\$4\\\\r\\\\nPING\\\\r\\\\n\" | nc -w2 localhost 6379)",
+      "Bash(pkill -9 -f \"spring-boot:run\" 2>/dev/null; sleep 2)",
+      "Bash(printf \"*1\\\\r\\\\n\\\\$4\\\\r\\\\nPING\\\\r\\\\n\" | nc -w2 localhost 6379 && echo \"---\"\nprintf \"*3\\\\r\\\\n\\\\$3\\\\r\\\\nSET\\\\r\\\\n\\\\$4\\\\r\\\\nname\\\\r\\\\n\\\\$7\\\\r\\\\nmacache\\\\r\\\\n\" | nc -w2 localhost 6379 && echo \"---\"\nprintf \"*2\\\\r\\\\n\\\\$3\\\\r\\\\nGET\\\\r\\\\n\\\\$4\\\\r\\\\nname\\\\r\\\\n\" | nc -w2 localhost 6379 && echo \"---\")",
+      "Bash(pkill -9 -f \"macache\" 2>/dev/null; sleep 2)",
+      "Bash(printf \"*1\\\\r\\\\n\\\\$4\\\\r\\\\nPING\\\\r\\\\n\" | nc -w2 localhost 6379; sleep 1; cat /tmp/macache.log | grep -E \"Decoder|Received\")",
+      "Bash(redis-cli -p 6379 SET name macache && \\\\\nredis-cli -p 6379 GET name && \\\\\nredis-cli -p 6379 STRLEN name && \\\\\nredis-cli -p 6379 SET counter 10 && \\\\\nredis-cli -p 6379 INCR counter && \\\\\nredis-cli -p 6379 DECR counter && \\\\\nredis-cli -p 6379 MSET k1 v1 k2 v2 && \\\\\nredis-cli -p 6379 MGET k1 k2 && \\\\\nredis-cli -p 6379 EXISTS name && \\\\\nredis-cli -p 6379 DEL name && \\\\\nredis-cli -p 6379 EXISTS name)",
+      "Bash(redis-cli -p 6379 INFO)",
+      "Bash(redis-cli -p 6379 COMMAND)",
+      "Bash(redis-cli -p 6379 COMMAND DOCS 2>&1 | head -5)",
+      "Bash(timeout 3 redis-cli -p 6379 2>&1 || true; sleep 1; grep \"CMD:\" /tmp/macache.log | tail -10)",
+      "Bash(timeout 3 redis-cli -p 6379 -3 2>&1 || true; sleep 1; grep \"CMD:\" /tmp/macache.log | tail -20)",
+      "Bash(redis-cli -p 6379 HELLO 3 2>&1)",
+      "Bash(printf \"PING\\\\r\\\\nSET foo bar\\\\r\\\\nGET foo\\\\r\\\\nQUIT\\\\r\\\\n\" | redis-cli -p 6379 2>&1)",
+      "Bash(printf \"PING\\\\r\\\\nSET name macache\\\\r\\\\nGET name\\\\r\\\\nQUIT\\\\r\\\\n\" | redis-cli -p 6379 2>&1)",
+      "Bash(redis-cli -p 6379 HELLO 2 2>&1)",
+      "Bash(cat > /tmp/test_interactive.sh << 'EOF'\n#!/bin/bash\n\\(\n  sleep 0.5\n  echo \"PING\"\n  sleep 0.3\n  echo \"SET foo bar\"\n  sleep 0.3\n  echo \"GET foo\"\n  sleep 0.3\n  echo \"QUIT\"\n\\) | redis-cli -p 6379\nEOF\nchmod +x /tmp/test_interactive.sh\n/tmp/test_interactive.sh 2>&1)",
+      "Bash(timeout 2 redis-cli -p 6379 2>&1 || echo \"Exit code: $?\")"
+    ]
+  }
+}
