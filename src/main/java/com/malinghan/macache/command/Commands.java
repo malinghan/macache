@@ -69,7 +69,7 @@ public class Commands {
         register(new PersistCommand());
     }
 
-    private static void register(Command cmd) {
+    public static void register(Command cmd) {
         map.put(cmd.name().toUpperCase(), cmd);
     }
 

@@ -21,6 +21,10 @@ public class MaCache {
         return (CacheEntry<T>) entry;
     }
 
+    public Map<String, CacheEntry<?>> getAll() {
+        return Collections.unmodifiableMap(map);
+    }
+
     public void cleanExpired() {
         List<String> sample = new ArrayList<>(map.keySet());
         if (sample.size() > 20) Collections.shuffle(sample);

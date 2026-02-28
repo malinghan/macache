@@ -1,5 +1,7 @@
 package com.malinghan.macache.server;
 
+import com.malinghan.macache.core.MaCache;
+import com.malinghan.macache.persistence.AofLoader;
 import com.malinghan.macache.plugin.MaPlugin;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelInitializer;
@@ -21,8 +23,15 @@ public class MaCacheServer implements MaPlugin {
     @Autowired
     private MaCacheHandler handler;
 
+    @Autowired
+    private MaCache cache;
+
+    @Autowired
+    private AofLoader aofLoader;
+
     @Override
     public void init() {
+        aofLoader.load(cache);
         bossGroup = new NioEventLoopGroup(1);
         workerGroup = new NioEventLoopGroup(16);
     }

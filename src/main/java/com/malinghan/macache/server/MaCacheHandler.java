@@ -4,6 +4,7 @@ import com.malinghan.macache.command.Command;
 import com.malinghan.macache.command.Commands;
 import com.malinghan.macache.core.MaCache;
 import com.malinghan.macache.core.WrongTypeException;
+import com.malinghan.macache.persistence.AofWriter;
 import com.malinghan.macache.reply.Reply;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,6 +21,9 @@ public class MaCacheHandler extends SimpleChannelInboundHandler<String> {
 
     @Autowired
     private MaCache cache;
+
+    @Autowired
+    private AofWriter aofWriter;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
@@ -48,6 +52,9 @@ public class MaCacheHandler extends SimpleChannelInboundHandler<String> {
         try {
             Reply<?> reply = command.exec(cache, args);
             ctx.writeAndFlush(encode(reply));
+            if (aofWriter.isWriteCommand(cmdName)) {
+                aofWriter.append(msg);
+            }
         } catch (WrongTypeException e) {
             ctx.writeAndFlush("-" + e.getMessage() + "\r\n");
         } catch (Exception e) {
