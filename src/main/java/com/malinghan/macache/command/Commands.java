@@ -53,6 +53,14 @@ public class Commands {
         register(new HexistsCommand());
         register(new HmgetCommand());
 
+        // v2.0 ZSet
+        register(new ZaddCommand());
+        register(new ZcardCommand());
+        register(new ZscoreCommand());
+        register(new ZremCommand());
+        register(new ZrankCommand());
+        register(new ZcountCommand());
+
         // v3.0 TTL
         register(new ExpireCommand());
         register(new PexpireCommand());
