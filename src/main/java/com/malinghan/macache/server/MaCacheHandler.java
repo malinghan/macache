@@ -3,6 +3,7 @@ package com.malinghan.macache.server;
 import com.malinghan.macache.command.Command;
 import com.malinghan.macache.command.Commands;
 import com.malinghan.macache.core.MaCache;
+import com.malinghan.macache.core.WrongTypeException;
 import com.malinghan.macache.reply.Reply;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -22,7 +23,6 @@ public class MaCacheHandler extends SimpleChannelInboundHandler<String> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, String msg) {
-        System.out.println("[MaCacheHandler] Received: " + msg);
         String[] lines = msg.split("\\r\\n");
         if (lines.length == 0 || lines[0].isEmpty()) return;
 
@@ -39,15 +39,20 @@ public class MaCacheHandler extends SimpleChannelInboundHandler<String> {
         }
 
         String cmdName = args[0];
-        System.out.println("[MaCacheHandler] cmd:" + cmdName);
         Command command = Commands.get(cmdName);
         if (command == null) {
             ctx.writeAndFlush("-ERR unknown command '" + cmdName + "'\r\n");
             return;
         }
 
-        Reply<?> reply = command.exec(cache, args);
-        ctx.writeAndFlush(encode(reply));
+        try {
+            Reply<?> reply = command.exec(cache, args);
+            ctx.writeAndFlush(encode(reply));
+        } catch (WrongTypeException e) {
+            ctx.writeAndFlush("-" + e.getMessage() + "\r\n");
+        } catch (Exception e) {
+            ctx.writeAndFlush("-ERR " + e.getMessage() + "\r\n");
+        }
     }
 
     /**

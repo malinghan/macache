@@ -26,7 +26,13 @@
       "Bash(printf \"PING\\\\r\\\\nSET name macache\\\\r\\\\nGET name\\\\r\\\\nQUIT\\\\r\\\\n\" | redis-cli -p 6379 2>&1)",
       "Bash(redis-cli -p 6379 HELLO 2 2>&1)",
       "Bash(cat > /tmp/test_interactive.sh << 'EOF'\n#!/bin/bash\n\\(\n  sleep 0.5\n  echo \"PING\"\n  sleep 0.3\n  echo \"SET foo bar\"\n  sleep 0.3\n  echo \"GET foo\"\n  sleep 0.3\n  echo \"QUIT\"\n\\) | redis-cli -p 6379\nEOF\nchmod +x /tmp/test_interactive.sh\n/tmp/test_interactive.sh 2>&1)",
-      "Bash(timeout 2 redis-cli -p 6379 2>&1 || echo \"Exit code: $?\")"
+      "Bash(timeout 2 redis-cli -p 6379 2>&1 || echo \"Exit code: $?\")",
+      "Bash(redis-cli -p 6379 RPUSH mylist a b c && \\\\\nredis-cli -p 6379 LRANGE mylist 0 -1 && \\\\\nredis-cli -p 6379 LPUSH mylist x && \\\\\nredis-cli -p 6379 LINDEX mylist 0 && \\\\\nredis-cli -p 6379 LPOP mylist && \\\\\nredis-cli -p 6379 LLEN mylist)",
+      "Bash(redis-cli -p 6379 SADD myset apple banana cherry && \\\\\nredis-cli -p 6379 SMEMBERS myset && \\\\\nredis-cli -p 6379 SISMEMBER myset apple && \\\\\nredis-cli -p 6379 SREM myset banana && \\\\\nredis-cli -p 6379 SCARD myset && \\\\\nredis-cli -p 6379 SPOP myset 1)",
+      "Bash(redis-cli -p 6379 HSET user name malinghan age 30 city beijing && \\\\\nredis-cli -p 6379 HGET user name && \\\\\nredis-cli -p 6379 HGETALL user && \\\\\nredis-cli -p 6379 HEXISTS user email && \\\\\nredis-cli -p 6379 HDEL user city && \\\\\nredis-cli -p 6379 HLEN user && \\\\\nredis-cli -p 6379 HMGET user name age)",
+      "Bash(redis-cli -p 6379 ZADD leaderboard 100 alice 90 bob 95 carol && \\\\\nredis-cli -p 6379 ZCARD leaderboard && \\\\\nredis-cli -p 6379 ZSCORE leaderboard alice && \\\\\nredis-cli -p 6379 ZRANK leaderboard bob && \\\\\nredis-cli -p 6379 ZCOUNT leaderboard 90 100 && \\\\\nredis-cli -p 6379 ZREM leaderboard bob && \\\\\nredis-cli -p 6379 ZCARD leaderboard)",
+      "Bash(git commit -m \"$\\(cat <<'EOF'\nAdd v3.0 development plan\n\nCo-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>\nEOF\n\\)\")",
+      "Bash(git push origin master && git push origin v1.0 v2.0 2>&1)"
     ]
   }
 }

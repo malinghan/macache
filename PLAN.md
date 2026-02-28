@@ -86,10 +86,10 @@ PING
 # 期望: PONG
 
 # 2. 基本读写
-SET name kimmking
+SET name malinghan
 # 期望: OK
 GET name
-# 期望: "kimmking"
+# 期望: "malinghan"
 
 # 3. 不存在的 key
 GET notexist
@@ -212,18 +212,18 @@ SPOP myset 1
 # 期望: 随机弹出一个元素
 
 # === Hash 测试 ===
-HSET user name kimmking age 30 city beijing
+HSET user name malinghan age 30 city beijing
 HGET user name
-# 期望: "kimmking"
+# 期望: "malinghan"
 HGETALL user
-# 期望: name, kimmking, age, 30, city, beijing
+# 期望: name, malinghan, age, 30, city, beijing
 HEXISTS user email
 # 期望: (integer) 0
 HDEL user city
 HLEN user
 # 期望: (integer) 2
 HMGET user name age
-# 期望: 1) "kimmking"  2) "30"
+# 期望: 1) "malinghan"  2) "30"
 
 # === ZSet 测试 ===
 ZADD leaderboard 100 alice 90 bob 95 carol

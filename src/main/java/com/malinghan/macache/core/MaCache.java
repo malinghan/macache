@@ -7,7 +7,62 @@ import java.util.*;
 @Component
 public class MaCache {
 
-    private final Map<String, CacheEntry<?>> map = new HashMap<>();
+    final Map<String, CacheEntry<?>> map = new HashMap<>();
+
+    // ==================== Internal ====================
+
+    @SuppressWarnings("unchecked")
+    private <T> CacheEntry<T> getEntry(String key) {
+        CacheEntry<?> entry = map.get(key);
+        if (entry != null && entry.isExpired()) {
+            map.remove(key);
+            return null;
+        }
+        return (CacheEntry<T>) entry;
+    }
+
+    public void cleanExpired() {
+        List<String> sample = new ArrayList<>(map.keySet());
+        if (sample.size() > 20) Collections.shuffle(sample);
+        sample.stream().limit(20).forEach(k -> getEntry(k)); // triggers lazy delete
+    }
+
+    // ==================== TTL ====================
+
+    public long expire(String key, long seconds) {
+        CacheEntry<?> entry = getEntry(key);
+        if (entry == null) return 0;
+        entry.setExpireAt(System.currentTimeMillis() + seconds * 1000);
+        return 1;
+    }
+
+    public long pexpire(String key, long millis) {
+        CacheEntry<?> entry = getEntry(key);
+        if (entry == null) return 0;
+        entry.setExpireAt(System.currentTimeMillis() + millis);
+        return 1;
+    }
+
+    public long ttl(String key) {
+        CacheEntry<?> entry = map.get(key);
+        if (entry == null || entry.isExpired()) return -2;
+        if (entry.getExpireAt() == -1) return -1;
+        return Math.max(0, (entry.getExpireAt() - System.currentTimeMillis()) / 1000);
+    }
+
+    public long pttl(String key) {
+        CacheEntry<?> entry = map.get(key);
+        if (entry == null || entry.isExpired()) return -2;
+        if (entry.getExpireAt() == -1) return -1;
+        return Math.max(0, entry.getExpireAt() - System.currentTimeMillis());
+    }
+
+    public long persist(String key) {
+        CacheEntry<?> entry = getEntry(key);
+        if (entry == null || entry.getExpireAt() == -1) return 0;
+        entry.setExpireAt(-1);
+        return 1;
+    }
 
     // ==================== String ====================
 
@@ -16,8 +71,10 @@ public class MaCache {
     }
 
     public String get(String key) {
-        CacheEntry<?> entry = map.get(key);
-        return entry == null ? null : (String) entry.getValue();
+        CacheEntry<String> entry = getEntry(key);
+        if (entry == null) return null;
+        if (!(entry.getValue() instanceof String)) throw new WrongTypeException();
+        return entry.getValue();
     }
 
     public int strlen(String key) {
@@ -36,7 +93,7 @@ public class MaCache {
     public long exists(String... keys) {
         long count = 0;
         for (String key : keys) {
-            if (map.containsKey(key)) count++;
+            if (getEntry(key) != null) count++;
         }
         return count;
     }
@@ -58,16 +115,12 @@ public class MaCache {
     }
 
     public void mset(String[] keys, String[] values) {
-        for (int i = 0; i < keys.length; i++) {
-            set(keys[i], values[i]);
-        }
+        for (int i = 0; i < keys.length; i++) set(keys[i], values[i]);
     }
 
     public List<String> mget(String... keys) {
         List<String> result = new ArrayList<>();
-        for (String key : keys) {
-            result.add(get(key));
-        }
+        for (String key : keys) result.add(get(key));
         return result;
     }
 
@@ -75,8 +128,9 @@ public class MaCache {
 
     @SuppressWarnings("unchecked")
     private LinkedList<String> getList(String key) {
-        CacheEntry<?> entry = map.get(key);
+        CacheEntry<?> entry = getEntry(key);
         if (entry == null) return null;
+        if (!(entry.getValue() instanceof LinkedList)) throw new WrongTypeException();
         return (LinkedList<String>) entry.getValue();
     }
 
@@ -141,8 +195,9 @@ public class MaCache {
 
     @SuppressWarnings("unchecked")
     private LinkedHashSet<String> getSet(String key) {
-        CacheEntry<?> entry = map.get(key);
+        CacheEntry<?> entry = getEntry(key);
         if (entry == null) return null;
+        if (!(entry.getValue() instanceof LinkedHashSet)) throw new WrongTypeException();
         return (LinkedHashSet<String>) entry.getValue();
     }
 
@@ -201,8 +256,9 @@ public class MaCache {
 
     @SuppressWarnings("unchecked")
     private LinkedHashMap<String, String> getHash(String key) {
-        CacheEntry<?> entry = map.get(key);
+        CacheEntry<?> entry = getEntry(key);
         if (entry == null) return null;
+        if (!(entry.getValue() instanceof LinkedHashMap)) throw new WrongTypeException();
         return (LinkedHashMap<String, String>) entry.getValue();
     }
 
@@ -267,8 +323,9 @@ public class MaCache {
 
     @SuppressWarnings("unchecked")
     private TreeSet<ZsetEntry> getZset(String key) {
-        CacheEntry<?> entry = map.get(key);
+        CacheEntry<?> entry = getEntry(key);
         if (entry == null) return null;
+        if (!(entry.getValue() instanceof TreeSet)) throw new WrongTypeException();
         return (TreeSet<ZsetEntry>) entry.getValue();
     }
 
@@ -283,7 +340,6 @@ public class MaCache {
 
     public long zadd(String key, double score, String member) {
         TreeSet<ZsetEntry> zset = getOrCreateZset(key);
-        // remove existing entry for this member if present
         zset.removeIf(e -> e.getValue().equals(member));
         return zset.add(new ZsetEntry(member, score)) ? 1 : 0;
     }
@@ -307,9 +363,7 @@ public class MaCache {
         TreeSet<ZsetEntry> zset = getZset(key);
         if (zset == null) return 0;
         long count = 0;
-        for (String m : members) {
-            if (zset.removeIf(e -> e.getValue().equals(m))) count++;
-        }
+        for (String m : members) if (zset.removeIf(e -> e.getValue().equals(m))) count++;
         return count;
     }
 
